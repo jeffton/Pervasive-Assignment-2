@@ -6,3 +6,11 @@
 *.synctex.gz
 *.class
 bin/
+/build
+/classes
+*.class
+*~
+/AndroidApp/gen
+/AndroidApp/gen/*
+/AndroidApp/bin
+/AndroidApp/bin/*
