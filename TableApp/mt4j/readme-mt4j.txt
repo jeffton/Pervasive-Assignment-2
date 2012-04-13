@@ -1,0 +1,1 @@
+Copy mt4j-core & mt4j-desktop into this folder. Not checked in as it's 80 MB.
