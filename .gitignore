@@ -6,6 +6,8 @@
 *.synctex.gz
 *.class
 bin/
+obj/
+*.suo
 /build
 /classes
 *.class

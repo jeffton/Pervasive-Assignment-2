@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
+using System.ComponentModel;
 
 namespace NfcCoin
 {
@@ -16,28 +18,60 @@ namespace NfcCoin
 
     static void Main(string[] args)
     {
+      KillOtherInstances();
+
       ReadArguments(args);
 
-      _reader = new CardReaderWrapper();
-      _reader.CardReadyChanged += new CardReaderWrapper.CardReadyChangedHandler(reader_CardReadyChanged);
-      _reader.Start();
+      try
+      {
+        _reader = new CardReaderWrapper();
+        _reader.CardReadyChanged += new CardReaderWrapper.CardReadyChangedHandler(reader_CardReadyChanged);
+        _reader.Start();
+      }
+      catch (NoReaderConnectedException)
+      {
+        Console.Error.WriteLine("No NFC-reader");
+        Environment.Exit(1);
+      }
+    }
+
+    private static void KillOtherInstances()
+    {
+      foreach (var process in Process.GetProcessesByName("NfcCoin")
+        .Where(p => p.Id != Process.GetCurrentProcess().Id))
+      {
+        TryKillProcess(process);
+      }
+    }
+
+    private static void TryKillProcess(Process process)
+    {
+      try
+      {
+        process.Kill();
+      }
+      catch (Exception ex)
+      {
+        if (!(ex is Win32Exception || ex is InvalidOperationException))
+          throw;
+      }
     }
 
     private static void ReadArguments(string[] args)
     {
-      if (args[0] == "refill")
+      if (args.Length >= 3 && args[0] == "refill")
       {
         _mode = Modes.Refill;
         _refillName = args[1];
         _refillAmount = args[2];
       }
-      else if (args[0] == "spend")
+      else if (args.Length > 0 && args[0] == "spend")
       {
         _mode = Modes.Spend;
       }
       else
       {
-        Console.WriteLine(@"Usage:
+        Console.Error.WriteLine(@"Usage:
 refill <name> <amount>
 Reader will save name and amount to any cards inserted.
 
@@ -46,8 +80,7 @@ Once a card is inserted, ""<name>/<amount>"" is sent to stdout.
 The reader waits for a line on stdin - if this line has the form ""charge/<amount>"", the amount is charged from the card.
 No validation is performed; this must be done on the client side.");
 
-
-        Environment.Exit(0);
+        Environment.Exit(2);
       }
     }
 
