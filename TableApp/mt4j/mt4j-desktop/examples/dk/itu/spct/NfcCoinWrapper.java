@@ -34,6 +34,11 @@ public class NfcCoinWrapper implements Runnable {
 
       while (true) {
         String line = stdOut.readLine();
+        if (line == null) {        
+          System.out.println("NFC helper disconnected");
+          return;
+        }
+        
         String[] parts = line.split("\\/");
         int charge = _cardHandler.getChargeForCard(parts[0],
             Integer.parseInt(parts[1]));
