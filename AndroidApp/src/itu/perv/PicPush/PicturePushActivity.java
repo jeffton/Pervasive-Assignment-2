@@ -29,12 +29,22 @@ public class PicturePushActivity extends Activity {
         case SELECT_PHOTO:
             if(resultCode == RESULT_OK){
             	Uri selectedImage = imageReturnedIntent.getData();
-            	 Toast.makeText(PicturePushActivity.this, "pic selected!"+ selectedImage.toString() , Toast.LENGTH_SHORT).show();
+            	 Toast.makeText(PicturePushActivity.this, "pic selected!"+ selectedImage.toString() + " noget" , Toast.LENGTH_SHORT).show();
             	
             }
 //                Uri selectedImage = imageReturnedIntent.getData();
 //                InputStream imageStream = getContentResolver().openInputStream(selectedImage);
 //                Bitmap yourSelectedImage = BitmapFactory.decodeStream(imageStream);
+//            Kode til at sende billeder, kan først testes når webservice er oppe og køre...
+//            HttpClient httpClient = new DefaultHttpClient();
+//
+//            HttpPost httpPost = new HttpPost(url);
+//
+//            MultipartEntity multiPart = new MultipartEntity();
+//            multiPart.addPart("my_picture", new FileBody(new File(IMG_URL)));
+//
+//            httpPost.setEntity(multiPart);
+//            HttpResponse res = httpClient.execute(httpPost);
             }
         }
 }
