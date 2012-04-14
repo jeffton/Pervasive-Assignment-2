@@ -7,6 +7,10 @@ using SpringCardPCSC;
 
 namespace NfcCoin
 {
+  public class NoReaderConnectedException : Exception
+  {
+  }
+
   public class CardReaderWrapper
   {
     private SCardReader _reader;
@@ -18,7 +22,9 @@ namespace NfcCoin
 
     public CardReaderWrapper()
     {
-      string readerName = SCARD.Readers.First();
+      string readerName = SCARD.Readers.FirstOrDefault();
+      if (readerName == null)
+        throw new NoReaderConnectedException();
       _reader = new SCardReader(readerName);
       _channel = new SCardChannel(_reader);
     }

@@ -1,55 +1,58 @@
 package dk.itu.spct;
 
+import java.util.ArrayList;
+
 import org.mt4j.AbstractMTApplication;
 import org.mt4j.components.visibleComponents.widgets.MTImage;
-import org.mt4j.input.inputProcessors.IGestureEventListener;
-import org.mt4j.input.inputProcessors.MTGestureEvent;
-import org.mt4j.input.inputProcessors.componentProcessors.unistrokeProcessor.UnistrokeEvent;
-import org.mt4j.input.inputProcessors.componentProcessors.unistrokeProcessor.UnistrokeProcessor;
-import org.mt4j.input.inputProcessors.componentProcessors.unistrokeProcessor.UnistrokeUtils.Direction;
-import org.mt4j.input.inputProcessors.componentProcessors.unistrokeProcessor.UnistrokeUtils.UnistrokeGesture;
+import org.mt4j.input.IMTInputEventListener;
+import org.mt4j.input.inputData.MTInputEvent;
 import org.mt4j.sceneManagement.AbstractScene;
 import org.mt4j.util.MTColor;
 
 public class ImageScene extends AbstractScene {
 
+  private ArrayList<MTImage> _images = new ArrayList<MTImage>();
+  private MTImage _selectedImage = null;
+  private AbstractMTApplication _application;
+
   public ImageScene(AbstractMTApplication mtApplication, String name) {
     super(mtApplication, name);
-    
-    this.setClearColor(new MTColor(66,66,66));
-    
-    MTImage image1 = new MTImage(mtApplication, mtApplication.loadImage("images/photo_cat2.jpg"));
-    getCanvas().addChild(image1);
-    
-    UnistrokeProcessor up = new UnistrokeProcessor(mtApplication);
-    up.addTemplate(UnistrokeGesture.CIRCLE, Direction.CLOCKWISE);
-    up.addTemplate(UnistrokeGesture.CIRCLE, Direction.COUNTERCLOCKWISE);
-    up.addTemplate(UnistrokeGesture.RECTANGLE, Direction.CLOCKWISE);
-    up.addTemplate(UnistrokeGesture.RECTANGLE, Direction.COUNTERCLOCKWISE);
-    up.addTemplate(UnistrokeGesture.V, Direction.CLOCKWISE);
-    
-    image1.unregisterAllInputProcessors();
-    image1.removeAllGestureEventListeners();
-    
-    
-    
-    image1.registerInputProcessor(up);
-    image1.addGestureListener(UnistrokeProcessor.class, new IGestureEventListener(){
-      @Override
-      public boolean processGestureEvent(MTGestureEvent ge) {
-        UnistrokeEvent ue = (UnistrokeEvent)ge;        
-        
-        if (ue.getId() == UnistrokeEvent.GESTURE_ENDED && 
-            ue.getGesture() == UnistrokeGesture.V) {
-          System.out.println("We have a V on " + ue.getTarget());
-        }
-        
-        return false;
-      }
-    });
-    
-    MTImage image2 = new MTImage(mtApplication, mtApplication.loadImage("images/smiling-cat.jpg"));
-    getCanvas().addChild(image2);
+    _application = mtApplication;
+
+    this.setClearColor(new MTColor(66, 66, 66));
+
+    addImageFromFile("images/smiling-cat.jpg");
+    addImageFromFile("images/photo_cat2.jpg");
   }
+
+  private void addImageFromFile(String path) {
+    MTImage image = new MTImage(_application, _application.loadImage(path));
+    _images.add(image);
+    image.addInputListener(_imageInputListener);
+    getCanvas().addChild(image);
+  }
+
+  private IMTInputEventListener _imageInputListener = new IMTInputEventListener() {
+    @Override
+    public boolean processInputEvent(MTInputEvent inEvt) {
+      _selectedImage = (MTImage) inEvt.getTarget();
+      highlightSelectedImage();
+      return false;
+    }
+
+    private void highlightSelectedImage() {
+      for (MTImage image : _images) {
+        MTColor color = null;
+        if (image == _selectedImage)
+          color = new MTColor(255, 255, 0);
+        else
+          color = new MTColor(255, 255, 255);
+
+        image.setStrokeColor(color);
+        image.setFillColor(color);
+      }
+
+    }
+  };
 
 }
