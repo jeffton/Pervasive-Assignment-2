@@ -17,4 +17,5 @@ bin/
 
 */war/WEB-INF/lib
 */war/WEB-INF/lib/*
-*/war/WEB-INF/appengine-generate
+*/war/WEB-INF/appengine-generated
+*/war/WEB-INF/appengine-generated/*

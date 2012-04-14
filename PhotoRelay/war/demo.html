@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link type="text/css" rel="stylesheet" href="style.css">
+    <title>Fluid Photos @ ITU - Demo</title>
+  </head>
+  <body>
+    <h1>Fluid Photos @ ITU - Demo</h1>
+    <p><span>NOTE:</span> when uploading and deleting images small delays can occure before the results are registered. 
+      This is due to they way the Blobstore and the Objectstore in Google App Engine works.</p>
+    <div class="clearfix">    
+    <form action="" method="post" enctype="multipart/form-data" id="uploadPhoto">
+      <fieldset>
+        <legend>Upload Test</legend>      
+        <p><label for="nfcid">NFC ID:</label> <input type="text" name="nfcid" required="required"></p>
+        <p><label for="photos">Choose photos:</label> <input type="file" multiple="" name="photos" required="required"></p>
+        <p><input type="submit" value="Submit"> <input type="reset" value="Reset"></p>
+      </fieldset>
+    </form>
+    <form id="viewPhotos">
+      <fieldset>
+        <legend>View uploaded photos by ID (or leave empty for all)</legend>
+        <p><label for="nfcid">NFC ID:</label> <input type="text" name="nfcid"></p>
+        <p><input type="submit" value="Submit"> <input type="reset" value="Reset"></p>
+      </fieldset>
+    </form>
+    </div>
+    <div id="photoslist" class="hidden">      
+    </div>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script>
+      $(document).ready(function(){
+        $("#uploadPhoto").on('submit', function(e){
+          var form = $("#uploadPhoto");
+                             
+          // get upload url
+          if(form.attr("action") === "") {
+            $.get("/getUploadUrl", function(res) {
+              form.attr("action", res);
+              console.log(res);
+              form.submit();
+            });
+            e.preventDefault();            
+          }
+        });
+        
+        $("#viewPhotos").on("submit", function(e) {
+          var nfcid = $(this).find('input[name="nfcid"]').val(),
+              url = nfcid !== "" ? "/getPhotoUrlsByNfcId?nfcid=" + nfcid : "/getPhotoUrls";
+          
+          $.get(url, function(res) {
+            var photos = $("#photoslist"), img;
+            photos.empty();
+            if($.isArray(res) && res.length > 0) {              
+              for(var i=0,j=res.length; i<j; i++) {
+                photos.append('<figure><img src="/getPhotoById?id=' + encodeURIComponent(res[i].id) + '" />' + 
+                              '<figcaption><span>ID</span>: ' + res[i].id + '<br />' + 
+                              '<span>Filename</span>: ' + res[i].filename + '<br />' +
+                              '<span>Uploaded On</span>: ' + new Date(res[i].uploadedOn).toString() + '<br />' +
+                              '<span>NFC ID</span>: ' + res[i].nfcId + '<br />' +
+                              '<a class="delete warning" href="/deletePhotoById?id=' + encodeURIComponent(res[i].id) + '">Delete</a></figcaption></figure>');
+              };
+            } else {
+              photos.append('<p>No photos found!</p>');
+            }
+            photos.removeClass("hidden");
+          });                    
+          e.preventDefault();
+        });
+        
+        $('#photoslist').on('click', '.delete', function(e) {
+          var figure = $(this).parent().parent(),
+              url = $(this).attr('href');
+
+          figure.remove();              
+          $.get(url);          
+          e.preventDefault();
+        });
+      });
+    
+    </script>
+    
+  </body>
+</html>
