@@ -538,13 +538,11 @@ input[type=text]{
 legend {
 }
 
-#photoslist {
-  clear: both;
-  margin: 20px 0;
+#photoslist {  
 }
 
 #photoslist figure {
-  margin: 20px;  
+  margin: 0 30px 20px 0;  
   float: left;
   max-width: 20%;
 }

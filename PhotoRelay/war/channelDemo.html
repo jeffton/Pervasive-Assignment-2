@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link type="text/css" rel="stylesheet" href="style.css">
+    <title>Fluid Photos @ ITU - Channel Demo</title>
+  </head>
+  <body>
+    <script type="text/javascript" src="/_ah/channel/jsapi"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        // var token = '{{ token }}';
+        // var channel = new goog.appengine.Channel(token);
+        // var handler = {
+        // 'onopen' : function() {
+        // console.log("channel open");
+        // },
+        // 'onmessage' : function(m) {
+        // console.log("channem message: " + m);
+        // },
+        // 'onerror' : function() {
+        // console.log("channel error");
+        // },
+        // 'onclose' : function() {
+        // console.log("channel close");
+        // }
+        // };
+        // var socket = channel.open(handler);
+
+        var token, channel, socket;
+
+        $.get("/getNotificationToken", function(res) {
+          channel = new goog.appengine.Channel(res);
+          
+          var handler = {
+            'onopen' : function() {
+              console.log("channel open");
+            },
+            'onmessage' : function(m) {
+              console.log("channem message: " + m);
+            },
+            'onerror' : function() {
+              console.log("channel error");
+            },
+            'onclose' : function() {
+              console.log("channel close");
+            }
+          };
+          socket = channel.open(handler);
+        });
+      });
+    </script>
+  </body>
+</html>

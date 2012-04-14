@@ -21,30 +21,39 @@
     </form>
     <form id="viewPhotos">
       <fieldset>
-        <legend>View uploaded photos by ID (or leave empty for all)</legend>
+        <legend>Filter uploaded photos by ID (or leave empty for all)</legend>
         <p><label for="nfcid">NFC ID:</label> <input type="text" name="nfcid"></p>
         <p><input type="submit" value="Submit"> <input type="reset" value="Reset"></p>
       </fieldset>
     </form>
     </div>
+    <h2>Photo List</h2>
     <div id="photoslist" class="hidden">      
     </div>
     
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script>
       $(document).ready(function(){
+        var hasUploadUrl = false;
         $("#uploadPhoto").on('submit', function(e){
           var form = $("#uploadPhoto");
                              
           // get upload url
-          if(form.attr("action") === "") {
+          if(!hasUploadUrl) {
+            // prevent the form from submitted as usual
+            e.preventDefault();
+            
+            // get new upload url, need a unique for each upload
             $.get("/getUploadUrl", function(res) {
               form.attr("action", res);
               console.log(res);
               form.submit();
             });
-            e.preventDefault();            
-          }
+            
+            hasUploadUrl = true;            
+          } else {
+            hasUploadUrl = false;            
+          }          
         });
         
         $("#viewPhotos").on("submit", function(e) {
@@ -69,7 +78,7 @@
             photos.removeClass("hidden");
           });                    
           e.preventDefault();
-        });
+        }).trigger("submit");
         
         $('#photoslist').on('click', '.delete', function(e) {
           var figure = $(this).parent().parent(),
@@ -79,6 +88,8 @@
           $.get(url);          
           e.preventDefault();
         });
+        
+        
       });
     
     </script>

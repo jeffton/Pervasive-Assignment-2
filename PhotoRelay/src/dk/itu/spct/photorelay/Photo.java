@@ -6,13 +6,18 @@ import javax.persistence.Id;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.googlecode.objectify.annotation.Cached;
+import com.googlecode.objectify.annotation.Indexed;
+import com.googlecode.objectify.annotation.Unindexed;
 
 @Cached
 public class Photo {
-	@Id private String id;
-	private String nfcId;
-	private Date uploadedOn;
-	private String filename;
+	@Id String id;
+	@Indexed
+	String nfcId;
+	@Unindexed
+	Date uploadedOn;
+	@Unindexed
+	String filename;
 	
 	public BlobKey getBlobKey(){
 		return new BlobKey(id);
