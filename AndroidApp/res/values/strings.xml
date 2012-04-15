@@ -3,5 +3,9 @@
 
     <string name="hello">Hello World, PicturePushActivity!</string>
     <string name="app_name">PicturePush</string>
+    <string name="title">Upload photos</string>
+    <string name="BtnUpload">Upload</string>
+    <string name="BtnDownload">Download pics</string>
+
 
 </resources>
