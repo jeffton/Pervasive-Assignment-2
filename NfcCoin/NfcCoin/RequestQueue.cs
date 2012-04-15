@@ -6,6 +6,7 @@ using System.Threading;
 
 namespace General.Threading
 {
+  // By David Thomas, from http://zno.dk/airplayne
   public class RequestQueue<TRequestParameter, TResponse> : IDisposable
   {
     private int _timeout;
