@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link type="text/css" rel="stylesheet" href="style.css">
+    <title>Fluid Photos @ ITU - Photo Relay</title>
+  </head>
+  <body>
+    <h1>Fluid Photos @ ITU - Photo Relay</h1>
+    <p>Relay service used by Tabletop application and Android application phones to communicate.</p>
+    <p>See <a href="https://blog.itu.dk/SPCT-F2012/lab-classes/assignment-2/">Mandatory assignment #2 - Fluid photo browser w NFC-based payment and printed photo pickup</a> for more information.</p>
+    <h2>API</h2>
+    <p>Use the following service calls and to upload and retrive photographs.</p>
+    <p>See the source code for <a href="/demo.html">demo.html</a> for a HTML/JavaScript implementation.</p>
+    
+    <h3>Upload photographs</h3>
+    <p>Perform a HTTP POST (of enctype <code>multipart/form-data</code>) with all photos in the <code>photos</code> field and 
+    an NFCID in an <code>nfcid</code> field to the URL provided by the <code>/getUploadUrl</code> service call.    
+    </p> 
+    
+    <h3>Getting photographs</h3>
+    <p>Use the service call <code>/getPhotoUrls</code> to get the URLs to all uploaded photographs, or use 
+      <code>getPhotoUrlsByNfcId?nfcid=&lt;NFC ID&gt;</code> to get URLs of uploaded photographs associated with a 
+      specific NFC ID.</p>
+    <p>Use the service call <code>/getPhotoById?id=&lt;photo id&gt;</code> to get a specific photograph.</p>
+
+    <h3>Deleting a photograph</h3>
+    <p>Use the service call <code>/deletePhotoById?id=&lt;photo id&gt;</code> to delete a specific photograph.</p>
+  </body>
+</html>
