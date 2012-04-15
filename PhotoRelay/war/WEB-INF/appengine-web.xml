@@ -12,7 +12,7 @@
   <inbound-services>
     <service>channel_presence</service>
   </inbound-services>
-
+  
   <!--
     HTTP Sessions are disabled by default. To enable HTTP sessions specify:
 

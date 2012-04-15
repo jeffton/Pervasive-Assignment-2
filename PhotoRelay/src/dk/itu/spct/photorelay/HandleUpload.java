@@ -17,6 +17,7 @@ import org.json.JSONException;
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.channel.ChannelMessage;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
 
@@ -66,20 +67,18 @@ public class HandleUpload extends RelayServlet {
 				photos.add(p);
 			}
 			
-			//NotifyListeners(photos);
+			NotifyListeners(photos);
 		}
 
 		resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
 	}
 
-	private void NotifyListeners(List<Photo> photos) {
-		// notify listeners (table tops) about new photos		
+	private void NotifyListeners(List<Photo> photos) {	
 		try {
-			JSONArray json = CreateJSONResponse(photos);
-						
+			String msg = CreateJSONResponse(photos).toString();				
+			channelService.sendMessage(new ChannelMessage(CHANNEL_KEY, msg));				
 		} catch (JSONException e) {
 			log.throwing("HandleUpload", "CreateJSONResponse", e);
-		}
-		
+		}				
 	}
 }

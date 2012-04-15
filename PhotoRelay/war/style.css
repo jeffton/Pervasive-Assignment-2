@@ -538,7 +538,9 @@ input[type=text]{
 legend {
 }
 
-#photoslist {  
+#photoslist {
+  width: 65%;
+  float: left;
 }
 
 #photoslist figure {
@@ -554,7 +556,7 @@ legend {
 #photoslist figcaption {
   padding-top: 10px;
   font-size: 10px;
-  word-break: break-all;
+  word-wrap: break-word;
   line-height: 15px;
 }
 
@@ -573,4 +575,20 @@ code {
 
 .warning {
   color: red;
+}
+
+#messages {
+  width: 34%;
+  float: left;
+}
+
+#messages ul {
+  font-size: 10px;
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+#messages ul li {
+  word-wrap: break-word;
 }

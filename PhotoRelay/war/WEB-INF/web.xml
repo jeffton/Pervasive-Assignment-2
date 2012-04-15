@@ -6,14 +6,6 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   
   <servlet>
-    <servlet-name>NotificationServlet</servlet-name>
-    <servlet-class>dk.itu.spct.photorelay.NotificationServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>NotificationServlet</servlet-name>
-    <url-pattern>/*</url-pattern>
-  </servlet-mapping>
-  <servlet>
     <servlet-name>GetPhotoUrls</servlet-name>
     <servlet-class>dk.itu.spct.photorelay.GetPhotoUrls</servlet-class>
   </servlet>
@@ -53,6 +45,15 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
     <servlet-name>HandleUpload</servlet-name>
     <url-pattern>/uploadCompleted</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>NotificationServlet</servlet-name>
+    <servlet-class>dk.itu.spct.photorelay.NotificationServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>NotificationServlet</servlet-name>
+    <url-pattern>/token</url-pattern>
+  </servlet-mapping>    
+
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>

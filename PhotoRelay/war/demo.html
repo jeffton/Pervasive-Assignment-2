@@ -9,90 +9,44 @@
   <body>
     <h1>Fluid Photos @ ITU - Demo</h1>
     <p><span>NOTE:</span> when uploading and deleting images small delays can occure before the results are registered. 
-      This is due to they way the Blobstore and the Objectstore in Google App Engine works.</p>
+      This is due to they way the Blobstore and the Objectstore in Google App Engine works.</p>    
     <div class="clearfix">    
-    <form action="" method="post" enctype="multipart/form-data" id="uploadPhoto">
-      <fieldset>
-        <legend>Upload Test</legend>      
-        <p><label for="nfcid">NFC ID:</label> <input type="text" name="nfcid" required="required"></p>
-        <p><label for="photos">Choose photos:</label> <input type="file" multiple="" name="photos" required="required"></p>
-        <p><input type="submit" value="Submit"> <input type="reset" value="Reset"></p>
-      </fieldset>
-    </form>
-    <form id="viewPhotos">
-      <fieldset>
-        <legend>Filter uploaded photos by ID (or leave empty for all)</legend>
-        <p><label for="nfcid">NFC ID:</label> <input type="text" name="nfcid"></p>
-        <p><input type="submit" value="Submit"> <input type="reset" value="Reset"></p>
-      </fieldset>
-    </form>
+      <form action="" method="post" enctype="multipart/form-data" id="uploadPhoto">
+        <fieldset>
+          <legend>Upload Test</legend>      
+          <p><label for="nfcid">NFC ID:</label> <input type="text" name="nfcid" required="required"></p>
+          <p><label for="photos">Choose photos:</label> <input type="file" multiple="" name="photos" required="required"></p>
+          <p><input type="submit" value="Submit"> <input type="reset" value="Reset"></p>
+        </fieldset>
+      </form>
+      <form id="viewPhotos">
+        <fieldset>
+          <legend>Filter uploaded photos by ID (or leave empty for all)</legend>
+          <p><label for="nfcid">NFC ID:</label> <input type="text" name="nfcid"></p>
+          <p><input type="submit" value="Submit"> <input type="reset" value="Reset"></p>
+        </fieldset>
+      </form>
+      <form>
+        <fieldset>
+          <legend>Notifications Test</legend>
+          <p>Note: To test, subscribe in one browser, <br />and use another browser to upload a photo.</p>
+          <p>
+            <input type="button" id="subscribe" value="Subscribe" />
+            <input type="button" id="unsubscribe" value="Unsubscribe" />
+          </p>
+        </fieldset>
+      </form>
     </div>
-    <h2>Photo List</h2>
-    <div id="photoslist" class="hidden">      
+    <div id="photoslist" class="hidden">
+      <h2>Photo List</h2>      
     </div>
-    
+    <div id="messages">
+      <h2>Notification Messages</h2>
+      <ul></ul> 
+    </div>
+    <script type="text/javascript" src="/_ah/channel/jsapi"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script>
-      $(document).ready(function(){
-        var hasUploadUrl = false;
-        $("#uploadPhoto").on('submit', function(e){
-          var form = $("#uploadPhoto");
-                             
-          // get upload url
-          if(!hasUploadUrl) {
-            // prevent the form from submitted as usual
-            e.preventDefault();
-            
-            // get new upload url, need a unique for each upload
-            $.get("/getUploadUrl", function(res) {
-              form.attr("action", res);
-              console.log(res);
-              form.submit();
-            });
-            
-            hasUploadUrl = true;            
-          } else {
-            hasUploadUrl = false;            
-          }          
-        });
-        
-        $("#viewPhotos").on("submit", function(e) {
-          var nfcid = $(this).find('input[name="nfcid"]').val(),
-              url = nfcid !== "" ? "/getPhotoUrlsByNfcId?nfcid=" + nfcid : "/getPhotoUrls";
-          
-          $.get(url, function(res) {
-            var photos = $("#photoslist"), img;
-            photos.empty();
-            if($.isArray(res) && res.length > 0) {              
-              for(var i=0,j=res.length; i<j; i++) {
-                photos.append('<figure><img src="/getPhotoById?id=' + encodeURIComponent(res[i].id) + '" />' + 
-                              '<figcaption><span>ID</span>: ' + res[i].id + '<br />' + 
-                              '<span>Filename</span>: ' + res[i].filename + '<br />' +
-                              '<span>Uploaded On</span>: ' + new Date(res[i].uploadedOn).toString() + '<br />' +
-                              '<span>NFC ID</span>: ' + res[i].nfcId + '<br />' +
-                              '<a class="delete warning" href="/deletePhotoById?id=' + encodeURIComponent(res[i].id) + '">Delete</a></figcaption></figure>');
-              };
-            } else {
-              photos.append('<p>No photos found!</p>');
-            }
-            photos.removeClass("hidden");
-          });                    
-          e.preventDefault();
-        }).trigger("submit");
-        
-        $('#photoslist').on('click', '.delete', function(e) {
-          var figure = $(this).parent().parent(),
-              url = $(this).attr('href');
-
-          figure.remove();              
-          $.get(url);          
-          e.preventDefault();
-        });
-        
-        
-      });
-    
-    </script>
-    
+    <script src="photo-demo.js"></script>
+    <script src="notification-demo.js"></script>    
   </body>
 </html>
