@@ -59,9 +59,7 @@ public class ImageScene extends AbstractScene {
     if (_selectedImage == null)
       return;
     
-    
-    
-    
+    new ImageUploader().uploadImage("images/smiling-cat.jpg", "dummyId");
   }
 
   private void addButton(String imageFile, Vector3D position,
