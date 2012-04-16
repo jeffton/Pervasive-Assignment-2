@@ -20,6 +20,10 @@ import processing.core.PImage;
 
 public class ImageScene extends AbstractScene {
 
+  private interface TapAction {
+    public void onTap();
+  }
+
   private ArrayList<MTImage> _images = new ArrayList<MTImage>();
   private MTImage _selectedImage = null;
   private AbstractMTApplication _application;
@@ -36,23 +40,50 @@ public class ImageScene extends AbstractScene {
   }
 
   private void addButtons() {
-    MTImageButton effectButton = new MTImageButton(_application,
-        _application.loadImage("images/effect1Button.png"));
-    effectButton.setPositionGlobal(new Vector3D(964, 30));
+    addButton("images/effect1Button.png", new Vector3D(964, 30),
+        new TapAction() {
+          @Override
+          public void onTap() {
+            applyEffectToSelectedImage();
+          }
+        });
+    addButton("images/uploadButton.png", new Vector3D(964, 200), new TapAction() {
+      @Override
+      public void onTap() {
+        testUpload();
+      }
+    });
+  }
 
-    effectButton.addGestureListener(TapProcessor.class,
+  protected void testUpload() {
+    if (_selectedImage == null)
+      return;
+    
+    
+    
+    
+  }
+
+  private void addButton(String imageFile, Vector3D position,
+      final TapAction action) {
+    MTImageButton button = new MTImageButton(_application,
+        _application.loadImage(imageFile));
+    button.setPositionGlobal(position);
+
+    button.addGestureListener(TapProcessor.class,
         new IGestureEventListener() {
           @Override
           public boolean processGestureEvent(MTGestureEvent ge) {
             TapEvent event = (TapEvent) ge;
             if (!event.isTapDown()) {
-              applyEffectToSelectedImage();
+              action.onTap();
               return true;
             }
             return false;
           }
         });
-    getCanvas().addChild(effectButton);
+    getCanvas().addChild(button);
+
   }
 
   private void applyEffectToSelectedImage() {
