@@ -4,7 +4,6 @@ import javax.persistence.Id;
 import javax.servlet.http.HttpServletRequest;
 
 import com.googlecode.objectify.annotation.Cached;
-import com.googlecode.objectify.annotation.Unindexed;
 
 @Cached
 public class RelayClient {

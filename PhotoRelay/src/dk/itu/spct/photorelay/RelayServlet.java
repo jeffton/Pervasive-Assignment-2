@@ -34,6 +34,7 @@ public abstract class RelayServlet extends HttpServlet {
 			obj.put("nfcId", photo.getNfcId());
 			obj.put("filename", photo.getFilename());
 			obj.put("uploadedOn", photo.getUploadedOn().getTime());
+			obj.put("source", photo.getSource());
 			res.put(obj);
 		}
 		return res;

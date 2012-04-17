@@ -18,6 +18,8 @@ public class Photo {
 	Date uploadedOn;
 	@Unindexed
 	String filename;
+	@Unindexed
+	String source;
 	
 	public BlobKey getBlobKey(){
 		return new BlobKey(id);
@@ -53,6 +55,14 @@ public class Photo {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 	
 }

@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;

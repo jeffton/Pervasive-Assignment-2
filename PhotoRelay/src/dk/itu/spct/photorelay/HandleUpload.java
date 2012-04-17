@@ -7,11 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 
 import com.google.appengine.api.blobstore.BlobInfo;
@@ -63,6 +61,7 @@ public class HandleUpload extends RelayServlet {
 				p.setNfcId(id);
 				p.setUploadedOn(new Date());
 				p.setFilename(bi.getFilename());
+				p.setSource(req.getRemoteAddr() + ":" + req.getRemotePort());
 				ofy.put(p);
 				photos.add(p);
 			}
