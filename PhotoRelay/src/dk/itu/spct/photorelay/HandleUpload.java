@@ -40,6 +40,8 @@ public class HandleUpload extends RelayServlet {
 		List<BlobKey> uploadedPhotos = blobs.get("photos");
 						
 		String id = req.getParameter("nfcid");
+		String source = req.getParameter("source");
+		
 		// validate
 		if(id.isEmpty()) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, 
@@ -61,7 +63,7 @@ public class HandleUpload extends RelayServlet {
 				p.setNfcId(id);
 				p.setUploadedOn(new Date());
 				p.setFilename(bi.getFilename());
-				p.setSource(req.getRemoteAddr() + ":" + req.getRemotePort());
+				p.setSource(source);
 				ofy.put(p);
 				photos.add(p);
 			}
