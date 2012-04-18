@@ -122,6 +122,7 @@ public class ImageScene extends AbstractScene implements ImageListener {
       else
         newImageList.add(image);
     }
+    _images = newImageList;
   }
 
   private IMTInputEventListener _imageInputListener = new IMTInputEventListener() {

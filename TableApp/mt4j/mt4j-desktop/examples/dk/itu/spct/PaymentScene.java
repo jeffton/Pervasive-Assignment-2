@@ -42,7 +42,7 @@ public class PaymentScene extends AbstractScene {
         _imageCount = _imageScene.getImageCountForNfcId(_nfcId);
 
         showText("Hello " + id + ", you have " + availableAmount
-            + " coin(s).\n" + "Picture(s): " + _imageCount + "\n" + "Price: "
+            + " coin(s).\n\n" + "Picture(s): " + _imageCount + "\n" + "Price: "
             + _imageCount);
         enablePaymentButton(availableAmount >= _imageCount);
       }
@@ -80,7 +80,7 @@ public class PaymentScene extends AbstractScene {
   protected void acceptPayment() {
     _wrapper.charge(_imageCount);
     _imageScene.removeImagesForNfcId(_nfcId);
-    showText("Thank you!");
+    showText("Thank you!\nYou may remove your card.");
     enablePaymentButton(false);
     popSceneInASecond();
   }
@@ -90,7 +90,7 @@ public class PaymentScene extends AbstractScene {
       @Override
       public void run() {
         try {
-          Thread.sleep(1000);
+          Thread.sleep(1500);
         } catch (InterruptedException e) {
         }
         _application.invokeLater(new Runnable() {
