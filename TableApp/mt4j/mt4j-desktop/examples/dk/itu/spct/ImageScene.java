@@ -29,6 +29,8 @@ public class ImageScene extends AbstractScene {
 
     addImageFromFile("images/smiling-cat.jpg");
     addImageFromFile("images/photo_cat2.jpg");
+    @SuppressWarnings("unused")
+    ImageDownloader imageDownloader = new ImageDownloader();
     addButtons();
   }
 
