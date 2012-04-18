@@ -17,14 +17,15 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 public class ImageUploader {
 
-  public void uploadImage(String imageFile, String nfcId) {
+  public void uploadImage(TableImage image) {
     try {
       HttpClient httpClient = new DefaultHttpClient();
       String uploadUrl = getUploadUrl();
       HttpPost httpPost = new HttpPost(uploadUrl);
       MultipartEntity entity = new MultipartEntity();
-      entity.addPart("photos", new FileBody(new File(imageFile), "image/jpeg"));
-      entity.addPart("nfcid", new StringBody(nfcId));
+      entity.addPart("photos", new FileBody(new File(image.getFilePath()), "image/jpeg"));
+      entity.addPart("nfcid", new StringBody(image.getNfcId()));
+      entity.addPart("source", new StringBody("tabletop"));
       httpPost.setEntity(entity);
       httpClient.execute(httpPost);
     } catch (UnsupportedEncodingException e) {

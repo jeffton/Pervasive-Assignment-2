@@ -4,26 +4,20 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import org.mt4j.AbstractMTApplication;
-import org.mt4j.components.visibleComponents.widgets.buttons.MTImageButton;
 import org.mt4j.input.IMTInputEventListener;
 import org.mt4j.input.inputData.MTInputEvent;
-import org.mt4j.input.inputProcessors.IGestureEventListener;
-import org.mt4j.input.inputProcessors.MTGestureEvent;
-import org.mt4j.input.inputProcessors.componentProcessors.tapProcessor.TapEvent;
-import org.mt4j.input.inputProcessors.componentProcessors.tapProcessor.TapProcessor;
 import org.mt4j.sceneManagement.AbstractScene;
 import org.mt4j.util.MTColor;
 import org.mt4j.util.math.Vector3D;
 
-public class ImageScene extends AbstractScene {
+import dk.itu.spct.SceneUtilities.TapAction;
 
-  private interface TapAction {
-    public void onTap();
-  }
+public class ImageScene extends AbstractScene {
 
   private ArrayList<TableImage> _images = new ArrayList<TableImage>();
   private TableImage _selectedImage = null;
   private AbstractMTApplication _application;
+  private PaymentScene _paymentScene;
 
   public ImageScene(AbstractMTApplication mtApplication, String name) {
     super(mtApplication, name);
@@ -37,48 +31,51 @@ public class ImageScene extends AbstractScene {
   }
 
   private void addButtons() {
-    addButton("images/effect1Button.png", new Vector3D(964, 30),
-        new TapAction() {
-          @Override
-          public void onTap() {
-            applyEffectToSelectedImage();
-          }
-        });
-    addButton("images/uploadButton.png", new Vector3D(964, 200), new TapAction() {
+    int bottom = _application.getHeight();
+    int right = _application.getWidth();
+
+    SceneUtilities.addButton(this, "images/effect1Button.png", new Vector3D(
+        right - 60, 35), new TapAction() {
       @Override
       public void onTap() {
-        testUpload();
+        applyEffectToSelectedImage();
       }
     });
+    SceneUtilities.addButton(this, "images/uploadButton.png", new Vector3D(110,
+        bottom - 35), new TapAction() {
+      @Override
+      public void onTap() {
+        upload();
+      }
+    });
+    SceneUtilities.addButton(this, "images/paymentButton.png", new Vector3D(
+        right - 110, bottom - 35), new TapAction() {
+      @Override
+      public void onTap() {
+        showPaymentScene();
+      }
+    });
+
   }
 
-  protected void testUpload() {
-    if (_selectedImage == null)
-      return;
-    
-    new ImageUploader().uploadImage("images/smiling-cat.jpg", "dummyId");
+  protected void showPaymentScene() {
+    _application.pushScene();
+    if (_paymentScene == null) {
+      _paymentScene = new PaymentScene(_application, "Payment");
+      _application.addScene(_paymentScene);
+    }
+    _application.changeScene(_paymentScene);
   }
 
-  private void addButton(String imageFile, Vector3D position,
-      final TapAction action) {
-    MTImageButton button = new MTImageButton(_application,
-        _application.loadImage(imageFile));
-    button.setPositionGlobal(position);
-
-    button.addGestureListener(TapProcessor.class,
-        new IGestureEventListener() {
-          @Override
-          public boolean processGestureEvent(MTGestureEvent ge) {
-            TapEvent event = (TapEvent) ge;
-            if (!event.isTapDown()) {
-              action.onTap();
-              return true;
-            }
-            return false;
-          }
-        });
-    getCanvas().addChild(button);
-
+  protected void upload() {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        ImageUploader uploader = new ImageUploader();
+        for (TableImage image : _images)
+          uploader.uploadImage(image);
+      }
+    }).start();
   }
 
   private void applyEffectToSelectedImage() {

@@ -22,8 +22,7 @@ public class ImageApplication extends MTApplication {
 
   @Override
 	public void startUp() {
-    setupCoinListener();
-    
+    setupCoinListener();    
     addScene(new ImageScene(this, "Image scene"));
 	}
 
