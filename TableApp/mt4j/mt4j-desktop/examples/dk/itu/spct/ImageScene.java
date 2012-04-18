@@ -2,6 +2,7 @@ package dk.itu.spct;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.mt4j.AbstractMTApplication;
 import org.mt4j.input.IMTInputEventListener;
@@ -18,6 +19,7 @@ public class ImageScene extends AbstractScene {
   private TableImage _selectedImage = null;
   private AbstractMTApplication _application;
   private PaymentScene _paymentScene;
+  private static Random _random = new Random();
 
   public ImageScene(AbstractMTApplication mtApplication, String name) {
     super(mtApplication, name);
@@ -55,13 +57,12 @@ public class ImageScene extends AbstractScene {
         showPaymentScene();
       }
     });
-
   }
 
   protected void showPaymentScene() {
     _application.pushScene();
     if (_paymentScene == null) {
-      _paymentScene = new PaymentScene(_application, "Payment");
+      _paymentScene = new PaymentScene(_application, "Payment", this);
       _application.addScene(_paymentScene);
     }
     _application.changeScene(_paymentScene);
@@ -88,10 +89,36 @@ public class ImageScene extends AbstractScene {
   }
 
   private void addImageFromFile(String path) {
-    TableImage image = new TableImage(_application, path, "dummyId");
+    TableImage image = new TableImage(_application, path, "joe");
+    addTableImage(image);
+  }
+
+  private void addTableImage(TableImage image) {
+    image.setWidthXYGlobal(400);
+    int x = _random.nextInt(_application.getWidth() - 520) + 260;
+    int y = _random.nextInt(_application.getHeight() - 520) + 260;
+    image.setPositionGlobal(new Vector3D(x, y));
     _images.add(image);
     image.addInputListener(_imageInputListener);
     getCanvas().addChild(image);
+  }
+
+  public int getImageCountForNfcId(String id) {
+    int count = 0;
+    for (TableImage image : _images)
+      if (image.getNfcId().equals(id))
+        count++;
+    return count;
+  }
+
+  public void removeImagesForNfcId(String id) {
+    ArrayList<TableImage> newImageList = new ArrayList<TableImage>();
+    for (TableImage image : _images) {
+      if (image.getNfcId().equals(id))
+        getCanvas().removeChild(image);
+      else
+        newImageList.add(image);
+    }
   }
 
   private IMTInputEventListener _imageInputListener = new IMTInputEventListener() {

@@ -10,19 +10,8 @@ public class ImageApplication extends MTApplication {
 		initialize();
 	}
 	
-	private static void setupCoinListener() {
-    NfcCoinWrapper wrapper = new NfcCoinWrapper(new NfcCoinWrapper.INfcCardHandler() {
-      @Override
-      public int getChargeForCard(String id, int availableAmount) {
-        System.out.println("There's a card!");
-        return 4;
-      }
-    });
-  }
-
   @Override
 	public void startUp() {
-    setupCoinListener();    
     addScene(new ImageScene(this, "Image scene"));
 	}
 

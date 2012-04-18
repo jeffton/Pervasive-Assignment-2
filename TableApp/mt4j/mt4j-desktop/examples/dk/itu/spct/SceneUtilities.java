@@ -16,7 +16,7 @@ public class SceneUtilities {
     public void onTap();
   }
   
-  public static void addButton(AbstractScene scene, String imageFile, Vector3D position,
+  public static MTImageButton addButton(AbstractScene scene, String imageFile, Vector3D position,
       final TapAction action) {
     PApplet application = scene.getMTApplication();
     MTImageButton button = new MTImageButton(application,
@@ -35,5 +35,6 @@ public class SceneUtilities {
       }
     });
     scene.getCanvas().addChild(button);
+    return button;
   }
 }

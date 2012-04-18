@@ -4,46 +4,50 @@ import java.io.*;
 
 public class NfcCoinWrapper implements Runnable {
 
-  public interface INfcCardHandler {
-    /**
-     * @param id
-     *          The ID/name of the card
-     * @param availableAmount
-     *          How many coins are on the card
-     * @return The amount of coins to charge (0 to charge nothing)
-     */
-    public int getChargeForCard(String id, int availableAmount);
+  public interface INfcCardListener {
+    public void cardConnected(String id, int availableAmount);
+
+    public void cardDisconnected();
   }
 
-  private INfcCardHandler _cardHandler;
+  private INfcCardListener _cardListener;
+  private BufferedWriter _stdIn;
 
-  public NfcCoinWrapper(INfcCardHandler cardHandler) {
-    _cardHandler = cardHandler;
-
+  public NfcCoinWrapper(INfcCardListener cardListener) {
+    _cardListener = cardListener;
     new Thread(this).start();
+  }
+
+  public void charge(int amount) {
+    try {
+      _stdIn.write("charge/" + amount + System.getProperty("line.separator"));
+      _stdIn.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
   public void run() {
     try {
-      Process coinProcess = Runtime.getRuntime().exec("NfcCoin.exe spend");
+      Process coinProcess = Runtime.getRuntime().exec("NfcCoin.exe");
       BufferedReader stdOut = new BufferedReader(new InputStreamReader(
           coinProcess.getInputStream()));
-      BufferedWriter stdIn = new BufferedWriter(new OutputStreamWriter(
+      _stdIn = new BufferedWriter(new OutputStreamWriter(
           coinProcess.getOutputStream()));
 
       while (true) {
         String line = stdOut.readLine();
-        if (line == null) {        
+        if (line == null) {
           System.out.println("NFC helper disconnected");
           return;
         }
-        
+
         String[] parts = line.split("\\/");
-        int charge = _cardHandler.getChargeForCard(parts[0],
-            Integer.parseInt(parts[1]));
-        stdIn.write("charge/" + charge + System.getProperty("line.separator"));
-        stdIn.flush();
+        if (parts[0].equals("disconnected"))
+          _cardListener.cardDisconnected();
+        else if (parts[0].equals("connected"))
+          _cardListener.cardConnected(parts[1], Integer.parseInt(parts[2]));
       }
     } catch (IOException e) {
       e.printStackTrace();

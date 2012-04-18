@@ -28,6 +28,7 @@ public class ImageUploader {
       entity.addPart("source", new StringBody("tabletop"));
       httpPost.setEntity(entity);
       httpClient.execute(httpPost);
+      Log.write("Uploaded " + image.getFilePath());
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     } catch (ClientProtocolException e) {

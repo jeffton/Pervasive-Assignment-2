@@ -4,34 +4,60 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Threading;
 
 namespace NfcCoin
 {
   class Program
   {
     private static CardReaderWrapper _reader;
-    private enum Modes { Refill, Spend }
-    private static Modes _mode = Modes.Spend;
-
-    private static string _refillName;
-    private static string _refillAmount;
+    private static bool _coinCardConnected = false;
 
     static void Main(string[] args)
     {
       KillOtherInstances();
-
-      ReadArguments(args);
 
       try
       {
         _reader = new CardReaderWrapper();
         _reader.CardReadyChanged += new CardReaderWrapper.CardReadyChangedHandler(reader_CardReadyChanged);
         _reader.Start();
+        ThreadPool.QueueUserWorkItem((state) => HandleCommands());
       }
       catch (NoReaderConnectedException)
       {
         Console.Error.WriteLine("No NFC-reader");
         Environment.Exit(1);
+      }
+    }
+
+    private static object HandleCommands()
+    {
+      while (true)
+      {
+        string input = Console.ReadLine();
+        string[] parts = input.Split('/');
+        if (parts[0] == "charge")
+        {
+          int charge = int.Parse(parts[1]);
+          ChargeCard(charge);
+        }
+        else if (parts[0] == "refill")
+        {
+          string id = parts[1];
+          int amount = int.Parse(parts[2]);
+          WriteCoinStatus(new CoinStatus() { Id = id, Amount = amount });
+        }
+      }
+    }
+
+    private static void ChargeCard(int charge)
+    {
+      var coinStatus = ReadCoinStatus();
+      if (coinStatus != null)
+      {
+        coinStatus.Amount -= charge;
+        WriteCoinStatus(coinStatus);
       }
     }
 
@@ -57,83 +83,46 @@ namespace NfcCoin
       }
     }
 
-    private static void ReadArguments(string[] args)
-    {
-      if (args.Length >= 3 && args[0] == "refill")
-      {
-        _mode = Modes.Refill;
-        _refillName = args[1];
-        _refillAmount = args[2];
-      }
-      else if (args.Length > 0 && args[0] == "spend")
-      {
-        _mode = Modes.Spend;
-      }
-      else
-      {
-        Console.Error.WriteLine(@"Usage:
-refill <name> <amount>
-Reader will save name and amount to any cards inserted.
-
-spend
-Once a card is inserted, ""<name>/<amount>"" is sent to stdout.
-The reader waits for a line on stdin - if this line has the form ""charge/<amount>"", the amount is charged from the card.
-No validation is performed; this must be done on the client side.");
-
-        Environment.Exit(2);
-      }
-    }
-
     public static void reader_CardReadyChanged(CardReaderWrapper.CardStatus cardStatus)
     {
-      //Console.WriteLine("Card {0} {1}", cardStatus.Atr, cardStatus.Ready ? "ready" : "removed");
       if (cardStatus.Ready)
-        HandleCard();
+        PrintCoinStatus();
+      else
+        Console.WriteLine("disconnected");
     }
 
-    private static void HandleCard()
+    private static void PrintCoinStatus()
     {
-      switch (_mode)
-      {
-        case Modes.Refill:
-          RefillCard();
-          break;
-        case Modes.Spend:
-          Spend();
-          break;
-      }
+      var status = ReadCoinStatus();
+      if (status != null)
+        Console.WriteLine(string.Format("connected/{0}/{1}", status.Id, status.Amount));
     }
 
-    private static void Spend()
+    private static CoinStatus ReadCoinStatus()
     {
       string block1 = _reader.ReadBlockAsString(1);
       if (block1.StartsWith("pitC/"))
       {
         string id = block1.Split('/')[1];
         int amount = int.Parse(_reader.ReadBlockAsString(2));
-
-        Console.WriteLine(string.Format("{0}/{1}", id, amount));
-        string input = Console.ReadLine();
-
-        if (input.StartsWith("charge/"))
-        {
-          int charge = int.Parse(input.Split('/')[1]);
-          amount -= charge;
-          _reader.WriteStringToBlock(2, amount.ToString());
-          //Console.WriteLine("Thanks {0}, you have {1} coin(s) left!", id, amount);
-        }
+        return new CoinStatus() { Id = id, Amount = amount };
       }
+      return null;
     }
 
-    private static void RefillCard()
+    private static void WriteCoinStatus(CoinStatus status)
     {
-      string block1 = string.Format("pitC/{0}", _refillName);
-      string block2 = _refillAmount;
+      string block1 = string.Format("pitC/{0}", status.Id);
+      string block2 = status.Amount.ToString();
 
       _reader.WriteStringToBlock(1, block1);
       _reader.WriteStringToBlock(2, block2);
+    }
 
-      Console.WriteLine("Card refilled!");
+    private class CoinStatus
+    {
+      public string Id { get; set; }
+      public int Amount { get; set; }
     }
   }
 }
