@@ -23,7 +23,8 @@ public class ImageUploader {
       String uploadUrl = getUploadUrl();
       HttpPost httpPost = new HttpPost(uploadUrl);
       MultipartEntity entity = new MultipartEntity();
-      entity.addPart("photos", new FileBody(new File(image.getFilePath()), "image/jpeg"));
+      entity.addPart("photos", new FileBody(new File(image.getFilePath()),
+          "image/jpeg"));
       entity.addPart("nfcid", new StringBody(image.getNfcId()));
       entity.addPart("source", new StringBody("tabletop"));
       httpPost.setEntity(entity);
@@ -40,8 +41,7 @@ public class ImageUploader {
 
   private String getUploadUrl() throws ClientProtocolException, IOException {
     HttpClient httpClient = new DefaultHttpClient();
-    HttpGet get = new HttpGet(
-        "http://fluid-photos-at-itu.appspot.com/getUploadUrl");
+    HttpGet get = new HttpGet(Settings.APP_SPOT_URL + "/getUploadUrl");
     ResponseHandler<String> resp = new BasicResponseHandler();
     return httpClient.execute(get, resp);
   }

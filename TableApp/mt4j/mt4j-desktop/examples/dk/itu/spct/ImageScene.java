@@ -11,9 +11,10 @@ import org.mt4j.sceneManagement.AbstractScene;
 import org.mt4j.util.MTColor;
 import org.mt4j.util.math.Vector3D;
 
+import dk.itu.spct.ImageDownloader.ImageListener;
 import dk.itu.spct.SceneUtilities.TapAction;
 
-public class ImageScene extends AbstractScene {
+public class ImageScene extends AbstractScene implements ImageListener {
 
   private ArrayList<TableImage> _images = new ArrayList<TableImage>();
   private TableImage _selectedImage = null;
@@ -27,10 +28,10 @@ public class ImageScene extends AbstractScene {
 
     this.setClearColor(new MTColor(66, 66, 66));
 
-    addImageFromFile("images/smiling-cat.jpg");
-    addImageFromFile("images/photo_cat2.jpg");
+//    addImageFromFile("images/smiling-cat.jpg");
+//    addImageFromFile("images/photo_cat2.jpg");
     @SuppressWarnings("unused")
-    ImageDownloader imageDownloader = new ImageDownloader();
+    ImageDownloader imageDownloader = new ImageDownloader(this);
     addButtons();
   }
 
@@ -148,5 +149,16 @@ public class ImageScene extends AbstractScene {
 
     }
   };
+
+  @Override
+  public void imageDownloaded(final String filePath, final String nfcId) {
+    _application.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        TableImage tableImage = new TableImage(_application, filePath, nfcId);
+        addTableImage(tableImage);
+      }
+    });
+  }
 
 }
