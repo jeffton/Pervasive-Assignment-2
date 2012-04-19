@@ -201,6 +201,9 @@ public class ImageScene extends AbstractScene implements ImageListener {
 						case UnistrokeEvent.GESTURE_ENDED:
 							UnistrokeGesture g = ue.getGesture();
 							System.out.println("Recognized gesture: " + g);
+							if(g.equals(UnistrokeGesture.CUSTOMGESTURE)){
+								upload();
+							}
 							break;
 						default:
 							break;
