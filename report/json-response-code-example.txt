@@ -1,0 +1,16 @@
+[
+  {
+    "id":"AMIfv...",
+    "source":"android",
+    "filename":"DSC_0072.JPG",
+    "nfcId":"123",
+    "uploadedOn":1334853268514
+  },
+  {
+    "id":"4VYNz...",
+    "source":"android",
+    "filename":"DSC_0054.JPG",
+    "nfcId":"123",
+    "uploadedOn":1334853971989
+  }
+]
