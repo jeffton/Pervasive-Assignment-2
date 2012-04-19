@@ -146,10 +146,14 @@ public class GestureScene extends AbstractScene {
 			@Override
 			public boolean processInputEvent(MTInputEvent inEvt) {
 				Vertex[] v;
+				MTPolygon pol;
 				final AbstractCursorInputEvt posEvt = (AbstractCursorInputEvt) inEvt;
 				points.add(posEvt.getPosition());
 				vs.add(new Vertex(posEvt.getPosition()));
 				v = new Vertex[vs.size()];
+				pol = new MTPolygon(_application, vs.toArray(v));
+				
+				
 				if (v != null)
 					visualizer.setVertices(v);
 				visualizer.setNoFill(true);
