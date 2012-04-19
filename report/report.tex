@@ -38,9 +38,9 @@ breaklinks=true, }
 
 % use this command to override the default ACM copyright statement
 % (e.g. for preprints). Remove for camera ready copy.
-\toappear{}
+%\toappear{}
 
-\title{Fluid Photo Browser with NFC-based Payment and Printed Photo Pickup}
+\title{Fluid Photo Browser with\\NFC-based Payment and Printed Photo Pickup}
 \numberofauthors{3}
 \author{
   \alignauthor David Thomas\\
@@ -61,12 +61,14 @@ The task for this assignment was to develop a tabletop app for a photo print sho
 \section{Background}
 
 \subsection{Tabletop computing}\label{tabletopTheory}
-Tabletop computing generally covers the use of large, horizontally-mounted touch screens. As described in \cite{integratingTechnology}, this encourages usage that differs from the white board-inspired use of wall-mounted displays. Tabletop computers are often surrounded by people interacting from different angles.
+Tabletop computing generally covers the use of large, horiz-ontally-mounted touch screens. As described in \cite{integratingTechnology}, this encourages usage that differs from the white board-inspired use of wall-mounted displays. Tabletop computers are often surrounded by people interacting from different angles.
 
 \section{The System}
-The system we have implemented is described in the following. The source code is available at \url{https://github.com/jeffton/Pervasive-Assignment-2}.
+The system we have implemented consists of the parts shown in figure \ref{fig:deployment-diagram}: the tabletop app itself, an Android app for the customers, a service  on Google App Engine to facilitate communication between the tabletop app and the Android app, and finally a helper program to connect the tabletop to an NFC reader.
 
-\subsection{Overview}
+To summarize the scenario, the idea is that a user enters a print shop and uploads one or more pictures to their tabletop computer from an Android phone. The pictures are edited on the tabletop and sent back to the phone, and prints of the pictures are paid for using an NFC-based payment system.
+
+Each part is described in details in the following sections. The source code is available at \url{https://github.com/jeffton/Pervasive-Assignment-2}.
 
 \begin{figure}[t]
 \begin{center}
@@ -95,6 +97,14 @@ Finally, the \lstinline{PaymentScene} handles the payment flow. When an NFC card
 All transfers of images between the tabletop app and the Android app happen through the Google App Engine service described in section \ref{service}. Since the tabletop app subscribes to notifications from the service, images appear on the tabletop almost instantly after being uploaded from the Android app.
 
 \section{Android App}
+The android application has two functions, upload selected pictures to the tabletop and downloading the edited pictures.
+
+For selecting pictures we are using the Androids built in intent to select data on the device. In our case it is specified to be pictures. By using the built in intent, there is the disadvantage that we can only select one picture to upload at a time, which means that the user has to select upload again for each picture. For a better user experience, we should build a custom intent where the user is able to select more than one picture.
+
+When the user has selected a picture, it is uploaded to our service on Google App Engine, and then downloaded by the tabletop application.
+
+When the tabletop is done editing the picture and uploads it to the service on Google App Engine, the application receives a push notification with id of the picture, and starts downloading it. 
+We save the downloaded picture in a folder called PicPush so we don’t delete older pictures.
 
 \section{Service on Google App Engine}\label{service}
 
