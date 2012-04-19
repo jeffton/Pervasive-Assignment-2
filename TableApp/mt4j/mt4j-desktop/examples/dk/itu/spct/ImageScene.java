@@ -7,6 +7,11 @@ import java.util.Random;
 import org.mt4j.AbstractMTApplication;
 import org.mt4j.input.IMTInputEventListener;
 import org.mt4j.input.inputData.MTInputEvent;
+import org.mt4j.input.inputProcessors.IGestureEventListener;
+import org.mt4j.input.inputProcessors.MTGestureEvent;
+import org.mt4j.input.inputProcessors.componentProcessors.unistrokeProcessor.UnistrokeEvent;
+import org.mt4j.input.inputProcessors.componentProcessors.unistrokeProcessor.UnistrokeProcessor;
+import org.mt4j.input.inputProcessors.componentProcessors.unistrokeProcessor.UnistrokeUtils.UnistrokeGesture;
 import org.mt4j.sceneManagement.AbstractScene;
 import org.mt4j.util.MTColor;
 import org.mt4j.util.math.Vector3D;
@@ -16,150 +21,193 @@ import dk.itu.spct.SceneUtilities.TapAction;
 
 public class ImageScene extends AbstractScene implements ImageListener {
 
-  private ArrayList<TableImage> _images = new ArrayList<TableImage>();
-  private TableImage _selectedImage = null;
-  private AbstractMTApplication _application;
-  private PaymentScene _paymentScene;
-  private static Random _random = new Random();
+	private ArrayList<TableImage> _images = new ArrayList<TableImage>();
+	private TableImage _selectedImage = null;
+	private AbstractMTApplication _application;
+	private PaymentScene _paymentScene;
+	private GestureScene _gestureScene;
+	private static Random _random = new Random();
 
-  public ImageScene(AbstractMTApplication mtApplication, String name) {
-    super(mtApplication, name);
-    _application = mtApplication;
+	public ImageScene(AbstractMTApplication mtApplication, String name) {
+		super(mtApplication, name);
+		_application = mtApplication;
 
-    this.setClearColor(new MTColor(66, 66, 66));
+		this.setClearColor(new MTColor(66, 66, 66));
 
-//    addImageFromFile("images/smiling-cat.jpg");
-//    addImageFromFile("images/photo_cat2.jpg");
-    @SuppressWarnings("unused")
-    ImageDownloader imageDownloader = new ImageDownloader(this);
-    addButtons();
-  }
+		// addImageFromFile("images/smiling-cat.jpg");
+		// addImageFromFile("images/photo_cat2.jpg");
+		@SuppressWarnings("unused")
+		ImageDownloader imageDownloader = new ImageDownloader(this);
+		addButtons();
+		detectGesture();
+	}
 
-  private void addButtons() {
-    int bottom = _application.getHeight();
-    int right = _application.getWidth();
+	private void addButtons() {
+		int bottom = _application.getHeight();
+		int right = _application.getWidth();
 
-    SceneUtilities.addButton(this, "images/effect1Button.png", new Vector3D(
-        right - 60, 35), new TapAction() {
-      @Override
-      public void onTap() {
-        applyEffectToSelectedImage();
-      }
-    });
-    SceneUtilities.addButton(this, "images/uploadButton.png", new Vector3D(110,
-        bottom - 35), new TapAction() {
-      @Override
-      public void onTap() {
-        upload();
-      }
-    });
-    SceneUtilities.addButton(this, "images/paymentButton.png", new Vector3D(
-        right - 110, bottom - 35), new TapAction() {
-      @Override
-      public void onTap() {
-        showPaymentScene();
-      }
-    });
-  }
+		SceneUtilities.addButton(this, "images/effect1Button.png",
+				new Vector3D(right - 60, 35), new TapAction() {
+					@Override
+					public void onTap() {
+						applyEffectToSelectedImage();
+					}
+				});
+		SceneUtilities.addButton(this, "images/uploadButton.png", new Vector3D(
+				110, bottom - 35), new TapAction() {
+			@Override
+			public void onTap() {
+				upload();
+			}
+		});
+		SceneUtilities.addButton(this, "images/paymentButton.png",
+				new Vector3D(right - 110, bottom - 35), new TapAction() {
+					@Override
+					public void onTap() {
+						showPaymentScene();
+					}
+				});
 
-  protected void showPaymentScene() {
-    _application.pushScene();
-    if (_paymentScene == null) {
-      _paymentScene = new PaymentScene(_application, "Payment", this);
-      _application.addScene(_paymentScene);
-    }
-    _application.changeScene(_paymentScene);
-  }
+		SceneUtilities.addButton(this, "images/newGesture.png", new Vector3D(
+				60, 35), new TapAction() {
+			@Override
+			public void onTap() {
+				showGestureScene();
+			}
+		});
+	}
 
-  protected void upload() {
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        ImageUploader uploader = new ImageUploader();
-        for (TableImage image : _images)
-          uploader.uploadImage(image);
-      }
-    }).start();
-  }
+	protected void showPaymentScene() {
+		_application.pushScene();
+		if (_paymentScene == null) {
+			_paymentScene = new PaymentScene(_application, "Payment", this);
+			_application.addScene(_paymentScene);
+		}
+		_application.changeScene(_paymentScene);
+	}
 
-  private void applyEffectToSelectedImage() {
-    if (_selectedImage == null)
-      return;
+	protected void showGestureScene() {
+		_application.pushScene();
+		if (_gestureScene == null) {
+			_gestureScene = new GestureScene(_application, "Gesture", this);
+			_application.addScene(_gestureScene);
+		}
+		_application.changeScene(_gestureScene);
+	}
 
-    BufferedImage before = _selectedImage.getBufferedImage();
-    BufferedImage after = ImageProcessing.cropImage(before);
-    _selectedImage.setBufferedImage(after);
-  }
+	protected void upload() {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				ImageUploader uploader = new ImageUploader();
+				for (TableImage image : _images)
+					uploader.uploadImage(image);
+			}
+		}).start();
+	}
 
-  private void addImageFromFile(String path) {
-    TableImage image = new TableImage(_application, path, "joe");
-    addTableImage(image);
-  }
+	private void applyEffectToSelectedImage() {
+		if (_selectedImage == null)
+			return;
 
-  private void addTableImage(TableImage image) {
-    image.setWidthXYGlobal(400);
-    int x = _random.nextInt(_application.getWidth() - 520) + 260;
-    int y = _random.nextInt(_application.getHeight() - 520) + 260;
-    image.setPositionGlobal(new Vector3D(x, y));
-    _images.add(image);
-    image.addInputListener(_imageInputListener);
-    getCanvas().addChild(image);
-  }
+		BufferedImage before = _selectedImage.getBufferedImage();
+		BufferedImage after = ImageProcessing.cropImage(before);
+		_selectedImage.setBufferedImage(after);
+	}
 
-  public int getImageCountForNfcId(String id) {
-    int count = 0;
-    for (TableImage image : _images)
-      if (image.getNfcId().equals(id))
-        count++;
-    return count;
-  }
+	private void addImageFromFile(String path) {
+		TableImage image = new TableImage(_application, path, "joe");
+		addTableImage(image);
+	}
 
-  public void removeImagesForNfcId(String id) {
-    ArrayList<TableImage> newImageList = new ArrayList<TableImage>();
-    for (TableImage image : _images) {
-      if (image.getNfcId().equals(id))
-        getCanvas().removeChild(image);
-      else
-        newImageList.add(image);
-    }
-    _images = newImageList;
-  }
+	private void addTableImage(TableImage image) {
+		image.setWidthXYGlobal(400);
+		int x = _random.nextInt(_application.getWidth() - 520) + 260;
+		int y = _random.nextInt(_application.getHeight() - 520) + 260;
+		image.setPositionGlobal(new Vector3D(x, y));
+		_images.add(image);
+		image.addInputListener(_imageInputListener);
+		getCanvas().addChild(image);
+	}
 
-  private IMTInputEventListener _imageInputListener = new IMTInputEventListener() {
-    @Override
-    public boolean processInputEvent(MTInputEvent inEvt) {
-      TableImage selectedImage = (TableImage) inEvt.getTarget();
-      if (_selectedImage != selectedImage) {
-        _selectedImage = selectedImage;
-        highlightSelectedImage();
-      }
-      return false;
-    }
+	public int getImageCountForNfcId(String id) {
+		int count = 0;
+		for (TableImage image : _images)
+			if (image.getNfcId().equals(id))
+				count++;
+		return count;
+	}
 
-    private void highlightSelectedImage() {
-      for (TableImage image : _images) {
-        MTColor color = null;
-        if (image == _selectedImage)
-          color = new MTColor(255, 255, 0);
-        else
-          color = new MTColor(255, 255, 255);
+	public void removeImagesForNfcId(String id) {
+		ArrayList<TableImage> newImageList = new ArrayList<TableImage>();
+		for (TableImage image : _images) {
+			if (image.getNfcId().equals(id))
+				getCanvas().removeChild(image);
+			else
+				newImageList.add(image);
+		}
+		_images = newImageList;
+	}
 
-        image.setStrokeColor(color);
-        image.setFillColor(color);
-      }
+	private IMTInputEventListener _imageInputListener = new IMTInputEventListener() {
+		@Override
+		public boolean processInputEvent(MTInputEvent inEvt) {
+			TableImage selectedImage = (TableImage) inEvt.getTarget();
+			if (_selectedImage != selectedImage) {
+				_selectedImage = selectedImage;
+				highlightSelectedImage();
+			}
+			return false;
+		}
 
-    }
-  };
+		private void highlightSelectedImage() {
+			for (TableImage image : _images) {
+				MTColor color = null;
+				if (image == _selectedImage)
+					color = new MTColor(255, 255, 0);
+				else
+					color = new MTColor(255, 255, 255);
 
-  @Override
-  public void imageDownloaded(final String filePath, final String nfcId) {
-    _application.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        TableImage tableImage = new TableImage(_application, filePath, nfcId);
-        addTableImage(tableImage);
-      }
-    });
-  }
+				image.setStrokeColor(color);
+				image.setFillColor(color);
+			}
+
+		}
+	};
+
+	@Override
+	public void imageDownloaded(final String filePath, final String nfcId) {
+		_application.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				TableImage tableImage = new TableImage(_application, filePath,
+						nfcId);
+				addTableImage(tableImage);
+			}
+		});
+	}
+
+	public void detectGesture() {
+		getCanvas().addGestureListener(UnistrokeProcessor.class,
+				new IGestureEventListener() {
+					public boolean processGestureEvent(MTGestureEvent ge) {
+						UnistrokeEvent ue = (UnistrokeEvent) ge;
+						switch (ue.getId()) {
+						case UnistrokeEvent.GESTURE_STARTED:
+							getCanvas().addChild(ue.getVisualization());
+							break;
+						case UnistrokeEvent.GESTURE_UPDATED:
+							break;
+						case UnistrokeEvent.GESTURE_ENDED:
+							UnistrokeGesture g = ue.getGesture();
+							System.out.println("Recognized gesture: " + g);
+							break;
+						default:
+							break;
+						}
+						return false;
+					}
+				});
+	}
 
 }
