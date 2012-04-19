@@ -8,6 +8,7 @@ import org.mt4j.MTApplication;
 
 import org.mt4j.components.visibleComponents.shapes.MTPolygon;
 import org.mt4j.components.visibleComponents.shapes.MTRectangle;
+import org.mt4j.components.visibleComponents.widgets.MTTextArea;
 import org.mt4j.components.visibleComponents.widgets.buttons.MTImageButton;
 import org.mt4j.input.IMTInputEventListener;
 import org.mt4j.input.inputData.AbstractCursorInputEvt;
@@ -23,6 +24,8 @@ import org.mt4j.input.inputProcessors.componentProcessors.unistrokeProcessor.Uni
 import org.mt4j.input.inputProcessors.globalProcessors.RawFingerProcessor;
 import org.mt4j.sceneManagement.AbstractScene;
 import org.mt4j.util.MTColor;
+import org.mt4j.util.font.FontManager;
+import org.mt4j.util.font.IFont;
 import org.mt4j.util.math.Vector3D;
 import org.mt4j.util.math.Vertex;
 
@@ -32,6 +35,7 @@ public class GestureScene extends AbstractScene {
 	private AbstractMTApplication _application;
 	private ArrayList<Vector3D> points;
 	private RawFingerProcessor ra;
+	private MTTextArea _textArea;
 	private final AbstractScene _absScene;
 	GestureScene myself;
 	MTPolygon visualizer;
@@ -43,6 +47,7 @@ public class GestureScene extends AbstractScene {
 		_application = mtapp;
 		myself = this;
 		_absScene = absScene;
+		this.setClearColor(new MTColor(66, 66, 66));
 		MTRectangle rect = new MTRectangle(mtapp, 0, 0, 100, 100);
 		rect.unregisterAllInputProcessors();
 		rect.removeAllGestureEventListeners();
@@ -55,6 +60,9 @@ public class GestureScene extends AbstractScene {
 		getPoints();
 	}
 
+	/**
+	 * Add buttons to the scene
+	 */
 	public void addControls() {
 		int right = _application.getWidth();
 		int bottom = _application.getHeight();
@@ -69,8 +77,6 @@ public class GestureScene extends AbstractScene {
 						// Deletes that last point as it is at the same
 						// point as this button
 						points.remove(points.size() - 1);
-						testStroke();
-						// points.clear();
 						getCanvas().removeChild(visualizer);
 						
 						UnistrokeProcessor up = new UnistrokeProcessor(
@@ -109,6 +115,7 @@ public class GestureScene extends AbstractScene {
 				_application.popScene();
 			}
 		});
+		addTextArea();
 
 	}
 
@@ -126,6 +133,11 @@ public class GestureScene extends AbstractScene {
 							break;
 						case UnistrokeEvent.GESTURE_ENDED:
 							UnistrokeGesture g = ue.getGesture();
+							if(g.equals(UnistrokeGesture.CUSTOMGESTURE)){
+								showText("Gesture recongnized");
+							}else{
+								showText("Gesture NOT recongnized");
+							}
 							System.out.println("Recognized gesture: " + g);
 							break;
 						default:
@@ -136,6 +148,10 @@ public class GestureScene extends AbstractScene {
 				});
 	}
 
+	/**
+	 * Starts registers all movements on the screen.
+	 * @return
+	 */
 	public List<Vector3D> getPoints() {
 		ra = new RawFingerProcessor();
 
@@ -153,7 +169,6 @@ public class GestureScene extends AbstractScene {
 				v = new Vertex[vs.size()];
 				pol = new MTPolygon(_application, vs.toArray(v));
 				
-				
 				if (v != null)
 					visualizer.setVertices(v);
 				visualizer.setNoFill(true);
@@ -167,4 +182,26 @@ public class GestureScene extends AbstractScene {
 
 		return null;
 	}
+
+	  private void addTextArea() {
+		    IFont textFont = FontManager.getInstance().createFont(_application,
+		        "arial.ttf", 30, new MTColor(255, 255, 255));
+		    _textArea = new MTTextArea(_application, textFont);
+		    _textArea.setNoStroke(true);
+		    _textArea.setNoFill(true);
+		    _textArea.unregisterAllInputProcessors();
+		    _textArea.removeAllGestureEventListeners();
+		    getCanvas().addChild(_textArea);
+		  }
+
+	  private void showText(final String text) {
+		    _application.invokeLater(new Runnable() {
+		      @Override
+		      public void run() {
+		        _textArea.setText(text);
+		        _textArea.setPositionGlobal(new Vector3D(_application.getWidth() / 2,
+		            _application.getHeight() / 3));
+		      }
+		    });
+		  }
 }
