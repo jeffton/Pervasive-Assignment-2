@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.Toast;
 
 public class GetPic {
 	private String TAG = "PicPushSave";
@@ -131,6 +132,8 @@ public class GetPic {
 
 			outStream.flush();
 			outStream.close();
+			Log.i("downloadInfo","Download completed");
+			Toast.makeText(mainAcivity, "Download completed", Toast.LENGTH_LONG).show();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
