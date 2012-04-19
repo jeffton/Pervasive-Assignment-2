@@ -39,7 +39,7 @@ public class PicturePushActivity extends Activity {
 	private Handler mHandler;
 	private String pushStr;
 	private static final int SELECT_PHOTO = 100;
-	private String NFCid= "123";
+	private String NFCid= "321";
 	private ProgressDialog uploadDialog ;
 	private String picPath;
 
