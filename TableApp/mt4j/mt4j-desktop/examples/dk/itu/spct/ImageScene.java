@@ -47,7 +47,7 @@ public class ImageScene extends AbstractScene implements ImageListener {
 		int right = _application.getWidth();
 
 		SceneUtilities.addButton(this, "images/effect1Button.png",
-				new Vector3D(right - 60, 35), new TapAction() {
+				new Vector3D(right - 110, 35), new TapAction() {
 					@Override
 					public void onTap() {
 						applyEffectToSelectedImage();
@@ -69,7 +69,7 @@ public class ImageScene extends AbstractScene implements ImageListener {
 				});
 
 		SceneUtilities.addButton(this, "images/newGesture.png", new Vector3D(
-				60, 35), new TapAction() {
+				110, 35), new TapAction() {
 			@Override
 			public void onTap() {
 				showGestureScene();
