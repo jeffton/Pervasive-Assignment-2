@@ -31,7 +31,7 @@
 \maketitle
  
 \section{Introduction}
-The task for this assignment was to develop a tabletop app for a photo print shop, featuring transfer of photos between the tabletop and customers’ smartphones of as well as payment for printed photos using Near-Field Communication (NFC). The tabletop app should allow editing of the photos before printing them and sending them back to the customer.
+The task for this assignment was to develop a tabletop app for a photo print shop, featuring transfer of photos between the tabletop and customers' smartphones of as well as payment for printed photos using Near-Field Communication (NFC). The tabletop app should allow editing of the photos before printing them and sending them back to the customer.
  
 \section{Background}
  
@@ -41,7 +41,7 @@ Tabletop computing generally covers the use of large, horizontally-mounted touch
 \section{The System}
 The system we have implemented consists of the parts shown in figure \ref{fig:deployment-diagram}: the tabletop app itself, an Android app for the customers, a service  on Google App Engine to facilitate communication between the tabletop app and the Android app, and finally a helper program to connect the tabletop to an NFC reader.
  
-To summarize the scenario, the idea is that a customer enters a print shop and uploads one or more pictures to the shop’s tabletop computer from an Android phone. The pictures are edited on the tabletop and sent back to the phone, and printouts of the pictures are paid for using an NFC-based payment system.
+To summarize the scenario, the idea is that a customer enters a print shop and uploads one or more pictures to the shop's tabletop computer from an Android phone. The pictures are edited on the tabletop and sent back to the phone, and printouts of the pictures are paid for using an NFC-based payment system.
  
 Each part is described in details in the following sections. The source code is available at \url{https://github.com/jeffton/Pervasive-Assignment-2}.
  
@@ -64,7 +64,7 @@ MT4J \footnote{\url{http://mt4j.org}} is a Java-based framework for multitouch a
 \label{fig:image-scene}
 \end{figure}
  
-After editing, the images can be sent back to the phone -- either by applying a custom gesture, or by tapping the upload button. The custom gesture can be defined by tapping `New gesture’, which leads to the \lstinline{GestureScene}. Here, the user can define a gesture by recording a movement as a list of coordinates.
+After editing, the images can be sent back to the phone -- either by applying a custom gesture, or by tapping the upload button. The custom gesture can be defined by tapping `New gesture', which leads to the \lstinline{GestureScene}. Here, the user can define a gesture by recording a movement as a list of coordinates.
  
 Finally, the \lstinline{PaymentScene} handles the payment flow. When an NFC card is connected, the balance is shown along with the number of pictures corresponding to the ID stored on the card. When accepting the payment, the balance on the card is reduced, and the user is returned to the image scene where the purchased images have been removed.
  
@@ -79,7 +79,7 @@ For selecting pictures we are using the Androids built in intent to select data 
 When the user has selected a picture, it is uploaded to our service on Google App Engine, and then downloaded by the tabletop application.
  
 When the tabletop is done editing the picture and uploads it to the service on Google App Engine, the application receives a push notification with id of the picture, and starts downloading it.
-We save the downloaded picture in a folder called PicPush so we don’t delete older pictures.
+We save the downloaded picture in a folder called PicPush so we don't delete older pictures.
  
 \section{Service on Google App Engine}\label{service}
  
@@ -124,7 +124,7 @@ With the ID of each photo, the client can now call \lstinline{ /getPhotoById?id=
 It is also possible to delete a photo stored in the cloud service. This is done via a call to \lstinline{ /deletePhotoById?id=<photo id>} with the ID of the photo.
  
 \paragraph{Push notifications}
-The clients must acquire a security token before they can subscribe to receive push notifications from the cloud service. This is done through a \lstinline{HTTP GET} call to the \lstinline{/token} service call. Once a client has a token, it can use a Google App Engine Channel Client framework to do the heavy lifting of keeping the communication channel open. In our case, we used the Tom Parker’s Java AppEngine Channel Client framework\footnote{\url{http://masl.cis.gvsu.edu/2012/01/31/java-client-for-appengine-channels/}}.
+The clients must acquire a security token before they can subscribe to receive push notifications from the cloud service. This is done through a \lstinline{HTTP GET} call to the \lstinline{/token} service call. Once a client has a token, it can use a Google App Engine Channel Client framework to do the heavy lifting of keeping the communication channel open. In our case, we used the Tom Parker's Java AppEngine Channel Client framework\footnote{\url{http://masl.cis.gvsu.edu/2012/01/31/java-client-for-appengine-channels/}}.
  
 \section{NFC Payment}
 NFC technology is used for identification with the tabletop app as well as for payment. In our proof of concept, the payment takes place directly in the tabletop app. As we are lacking an NFC-enabled Android phone, a MiFare Classic NFC-card is used. We store information on blocks 1 and 2 on the card: block 1 contains a header and an ID, and the block 2 contains the amount of available coins.
