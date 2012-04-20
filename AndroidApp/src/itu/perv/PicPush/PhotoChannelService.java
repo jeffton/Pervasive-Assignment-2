@@ -21,7 +21,11 @@ public class PhotoChannelService implements ChannelService {
 		// TODO Auto-generated method stub
 
 	}
-
+	
+	/**
+	 * Receives the message from the channelservice, and if the nfcid is the same and it is not a android unit
+	 * that have send it, it will forwards it to getmessage. 
+	 */
 	@Override
 	public void onMessage(String message) {
 		try {

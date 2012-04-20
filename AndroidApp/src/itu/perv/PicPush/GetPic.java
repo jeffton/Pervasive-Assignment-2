@@ -20,6 +20,12 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * this class has been inspired with methods downloaded and modified from 
+ * http://blogingtutorials.blogspot.com/2010/12/download-image-on-sdcard-from-url-in.html
+ * 
+ */
+
 public class GetPic {
 	private String TAG = "PicPushSave";
 	private File sdImageMainDirectory;
@@ -33,6 +39,9 @@ public class GetPic {
 		createDir();
 	}
 	
+	/**
+	 * Creates a PicPush directory on the phone for downloaded images 
+	 */
 	private void createDir(){
 		sdImageMainDirectory = new File(Environment.getExternalStorageDirectory()+"/PicPush");
 		if(!sdImageMainDirectory.exists()){
@@ -50,6 +59,11 @@ public class GetPic {
 		}
 	}
 	
+	/**
+	 * AsyncTask class that
+	 * 
+	 *
+	 */
 	private class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
 		// This class definition states that DownloadImageTask will take String
 		// parameters, publish Integer progress updates, and return a Bitmap
@@ -111,7 +125,11 @@ public class GetPic {
 		}
 	}
 
-	
+	/**
+	 * Saves the bitmap object as a picture on the device sdcard. 
+	 * @param bitmap
+	 * @param name
+	 */
 	private void saveFile(Bitmap bitmap, String name) {
 		String filename = name;
 		ContentValues values = new ContentValues();
